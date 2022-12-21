@@ -21,12 +21,12 @@ public class Rectangle {
     /**
      * Vytvor nový obdĺžnik preddefinovanej farby na preddefinovanej pozícii.
      */
-    public Rectangle() {
-        this.stranaA = 30;
-        this.stranaB = 60;
-        this.lavyHornyX = 60;
-        this.lavyHornyY = 50;
-        this.farba = "red";
+    public Rectangle(int positionX, int positionY, int width, int height, String color) {
+        this.stranaA = height;
+        this.stranaB = width;
+        this.lavyHornyX = positionX;
+        this.lavyHornyY = positionY;
+        this.farba = color;
         this.jeViditelny = false;
     }
 

@@ -43,8 +43,8 @@ public class Canvas {
      */
     public static Canvas dajPlatno() {
         if (Canvas.platnoSingleton == null) {
-            Canvas.platnoSingleton = new Canvas("Jamky", 800, 800,
-                                         Color.white);
+            Canvas.platnoSingleton = new Canvas("SnakeMultiplayer", 800, 800,
+                                         Color.black);
             
         }
         Canvas.platnoSingleton.setVisible(true);
