@@ -1,6 +1,6 @@
 package org.example.game;
 
-public enum Direction {
+public enum SnakeDirection {
     UP,
     DOWN,
     RIGHT,
