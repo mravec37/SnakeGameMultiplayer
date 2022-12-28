@@ -14,33 +14,48 @@ public class Snake {
     private final int CELL_WIDTH;
     private final int CELL_HEIGHT;
 
+    private int numberOfCells;
     private final int SNAKE_POSITION_SHIFT;
+
+    private Color cellColor;
 
     public Snake(int positionX, int positionY, SnakeDirection snakeDirection, int numberOfCellsAtStart, int cellWidth
             , int cellHeight, Color cellColor, int snakePositionShift) {
         this.NUMBER_OF_CELLS_AT_START = numberOfCellsAtStart;
+        this.numberOfCells = this.NUMBER_OF_CELLS_AT_START;
         this.snakeDirection = snakeDirection;
         this.CELL_HEIGHT = cellHeight;
         this.CELL_WIDTH = cellWidth;
         this.snakeCells = new ArrayList<>();
         this.SNAKE_POSITION_SHIFT = snakePositionShift;
-        this.addCells(positionX, positionY, CELL_WIDTH, CELL_HEIGHT, cellColor, numberOfCellsAtStart, snakeDirection);
+        this.cellColor = cellColor;
+        this.addCells(positionX, positionY, CELL_WIDTH, CELL_HEIGHT, this.cellColor, numberOfCellsAtStart, snakeDirection);
     }
 
+    public void addCellToTail() {
+        int[] shiftOfXYPosition = this.positionShift(this.CELL_WIDTH, this.CELL_HEIGHT);
+        int shiftOfCellPositionX = -shiftOfXYPosition[0];
+        int shiftOfCellPositionY = -shiftOfXYPosition[1];
+        this.addCells(this.snakeCells.get(numberOfCells-1).getPositionX() + shiftOfCellPositionX,
+                this.snakeCells.get(numberOfCells-1).getPositionY() + shiftOfCellPositionY, this.CELL_WIDTH,
+                this.CELL_HEIGHT, this.cellColor, 1, this.snakeDirection);
+    }
     public void addCells(int positionX, int positionY, int cellWidth, int cellHeight, Color cellColor,
                         int numberOfCellsToAdd, SnakeDirection snakeDirection) {
-        int[] shiftOfXYPosition = this.positionShift(this.SNAKE_POSITION_SHIFT);
+        int[] shiftOfXYPosition = this.positionShift(this.CELL_WIDTH, this.CELL_HEIGHT);
         int shiftOfCellPositionX = -shiftOfXYPosition[0];
         int shiftOfCellPositionY = -shiftOfXYPosition[1];
         for (int i = 0; i < numberOfCellsToAdd; i++)  {
             this.snakeCells.add(new Cell(positionX, positionY, cellWidth, cellHeight, cellColor,new Rectangle()));
             positionX += shiftOfCellPositionX;
             positionY += shiftOfCellPositionY;
+            this.numberOfCells++;
 
         }
     }
+
     public void move() {
-        int[] shiftOfXYPosition = this.positionShift(this.SNAKE_POSITION_SHIFT);
+        int[] shiftOfXYPosition = this.positionShift(this.CELL_WIDTH, this.CELL_HEIGHT);
         int positionXShift = shiftOfXYPosition[0];
         int positionYShift = shiftOfXYPosition[1];
 
@@ -59,22 +74,22 @@ public class Snake {
         });*/
     }
 
-    private int[] positionShift(int positionShift) {
+    private int[] positionShift(int shiftX, int shiftY)  {
         int[] shiftOfXYPositions = new int[2];
         int shiftOfCellPositionX = 0;
         int shiftOfCellPositionY = 0;
         switch (snakeDirection) {
             case UP:
-                shiftOfCellPositionY = - positionShift;
+                shiftOfCellPositionY = - shiftY;
                 break;
             case RIGHT:
-                shiftOfCellPositionX = positionShift;
+                shiftOfCellPositionX = shiftX;
                 break;
             case DOWN:
-                shiftOfCellPositionY = positionShift;
+                shiftOfCellPositionY = shiftY;
                 break;
             case LEFT:
-                shiftOfCellPositionX = - positionShift;
+                shiftOfCellPositionX = - shiftX;
                 break;
         }
         shiftOfXYPositions[0] = shiftOfCellPositionX;
@@ -82,6 +97,13 @@ public class Snake {
         return shiftOfXYPositions;
     }
 
+    public int getNumberOfCells() {
+        return numberOfCells;
+    }
+
+    public void setNumberOfCells(int numberOfCells) {
+        this.numberOfCells = numberOfCells;
+    }
     public ArrayList<Cell> getSnakeCells() {
         return snakeCells;
     }

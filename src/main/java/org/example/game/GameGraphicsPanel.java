@@ -19,10 +19,12 @@ public class GameGraphicsPanel extends JPanel  implements ActionListener {
     private SnakeGame game;
     private  JTextField nameField;
     private boolean startScreen;
+    private ArrayList<DrawableGameObject> objectsToDraw;
     JButton continueButton;
     JButton enterNameButton;
     JLabel enterNameLabel;
     GameGraphicsPanel(SnakeGame game) {
+        this.objectsToDraw = new ArrayList<>();
         this.game = game;
         this.SCREEN_WIDTH = this.game.getScreenWidth();
         this.SCREEN_HEIGHT = this.game.getScreenHeight();
@@ -58,6 +60,10 @@ public class GameGraphicsPanel extends JPanel  implements ActionListener {
         nameField.setVisible(false);
     }
 
+    public void setObjectsToDraw(ArrayList<DrawableGameObject> objectsToDraw) {
+        this.objectsToDraw = objectsToDraw;
+    }
+
     private void setUpPanelComponents() {
         this.continueButton = new JButton("Continue");
         this.continueButton.setVisible(false);
@@ -79,11 +85,11 @@ public class GameGraphicsPanel extends JPanel  implements ActionListener {
 
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
-        ArrayList<DrawableGameObject> list = this.game.getDrawableObjects();
+        this.objectsToDraw = this.game.getDrawableObjects();
            if (startScreen)
                this.startScreen(g);
         else
-            draw(g, list);
+            draw(g, objectsToDraw);
     }
 
     public GameGraphicsPanel getGamePanel() {
