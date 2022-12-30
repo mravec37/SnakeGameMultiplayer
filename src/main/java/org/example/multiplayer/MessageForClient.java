@@ -7,18 +7,26 @@ import java.util.ArrayList;
 
 public class MessageForClient implements Serializable {
     private ArrayList<DrawableGameObject> objectsToDraw;
-    private boolean gameOver;
+    private boolean gameRunning;
+    private int clientScore;
 
-    public MessageForClient(ArrayList<DrawableGameObject> objectsToDraw, boolean gameOver) {
+    public MessageForClient(ArrayList<DrawableGameObject> objectsToDraw, boolean gameOver, int clientScore) {
+       // this.objectsToDraw = (ArrayList<DrawableGameObject>) objectsToDraw.clone();
         this.objectsToDraw = objectsToDraw;
-        this.gameOver = gameOver;
+        this.clientScore = clientScore;
+        //System.out.println("Objects to draw in message is: " + objectsToDraw.get(1).getX());
+        this.gameRunning = gameOver;
+    }
+
+    public int getClientScore() {
+        return this.clientScore;
     }
 
     public ArrayList<DrawableGameObject> getObjectsToDraw() {
         return this.objectsToDraw;
     }
 
-    public boolean isGameOver() {
-        return this.gameOver;
+    public boolean isGameRunning() {
+        return this.gameRunning;
     }
 }

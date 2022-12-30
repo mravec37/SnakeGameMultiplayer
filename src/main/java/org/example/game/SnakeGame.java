@@ -27,13 +27,16 @@ public class SnakeGame implements ActionListener {
     private final int CELL_WIDTH = 20;
     private final int CELL_HEIGHT = 20;
     private final int NUMBER_OF_CELLS_AT_START;
+    private ClientArrowKeyPressed clientArrowKeyPressed;
     public SnakeGame(int screenWidth, int screenHeight) {
         this.SCREEN_HEIGHT = screenHeight;
         this.SCREEN_WIDTH = screenWidth;
-        this.drawableObjects = new ArrayList<DrawableGameObject>(this.snake.getSnakeCells());
+        this.drawableObjects = new ArrayList<DrawableGameObject>();
         this.clientSnakes = new HashMap<>();
         this.NUMBER_OF_CELLS_AT_START = 10;
+        this.gameRunning = false;
         this.random = new Random();
+        this.clients = new ArrayList<>();
 
     }
     public void startGame() {
@@ -61,16 +64,16 @@ public class SnakeGame implements ActionListener {
         this.clients.forEach(client ->  {
             int positionXHead = this.clientSnakes.get(client).getSnakeCells().get(0).getPositionX();
             int positionYHead = this.clientSnakes.get(client).getSnakeCells().get(0).getPositionY();
-            this.checkCellCollisionWithFood(positionXHead, positionYHead, this.clientSnakes.get(client));
+            this.checkCellCollisionWithFood(positionXHead, positionYHead, this.clientSnakes.get(client), client);
         });
 
     }
 
-    private void checkCellCollisionWithFood(int positionX, int positionY, Snake snake) {
-        if (positionX == this.food.getPositionX() && positionY == this.food.getPositionY()) {
-            numberOfCells++;
-            foodEaten++;
-
+    private void checkCellCollisionWithFood(int positionX, int positionY, Snake snake, ClientHandler client) {
+        if (positionX >= this.food.getPositionX() -15 && positionX <=  this.food.getPositionX() + 15  && positionY >=
+                this.food.getPositionY() - 15 && positionY <= this.food.getPositionY() + 15) {
+            client.setClientScore(client.getClientScore() + 1);
+            System.out.println("Collision with food");
             snake.addCellToTail();
             newApple();
         }
@@ -79,31 +82,55 @@ public class SnakeGame implements ActionListener {
 
     public void checkCollisions() {
 
-       this.clients.forEach(client -> {
+    ArrayList<ClientHandler> clientsToRemove = new ArrayList<>();
+
+      this.clients.forEach(client -> {
             int positionXHead = this.clientSnakes.get(client).getSnakeCells().get(0).getPositionX();
             int positionYHead = this.clientSnakes.get(client).getSnakeCells().get(0).getPositionY();
 
-           if (positionYHead >= SCREEN_HEIGHT)
-               client.setGameOver(true);
-           if (positionYHead <= -this.snake.getCELL_HEIGHT())
-               client.setGameOver(true);
-           if (positionXHead >= SCREEN_WIDTH)
-               client.setGameOver(true);
-           if (positionXHead <= - this.snake.getCELL_WIDTH())
-               client.setGameOver(true);
+//           if (positionYHead >= SCREEN_HEIGHT)
+//               clientGameRunning = false;
+//           if (positionYHead <= -20)
+//               clientGameRunning = false;
+//           if (positionXHead >= SCREEN_WIDTH)
+//               clientGameRunning = false;
+//           if (positionXHead <= - 20)
+//               clientGameRunning = false;
+//           if (!clientGameRunning) {
+//               client.setGameRunning(false);
+//               clients.remove(client);
+//               this.drawableObjects.removeAll(this.clientSnakes.get(client).getSnakeCells());
+//           }
+
+          if (positionYHead >= SCREEN_HEIGHT)
+             clientsToRemove.add(client);
+          if (positionYHead <= -20)
+              clientsToRemove.add(client);
+          if (positionXHead >= SCREEN_WIDTH)
+              clientsToRemove.add(client);
+          if (positionXHead <= - 20)
+              clientsToRemove.add(client);
+
             this.clients.forEach(client2 -> {
                 this.clientSnakes.get(client2).getSnakeCells().forEach(cell -> {
                     if (positionXHead == cell.getPositionX() && positionYHead == cell.getPositionY() &&
                             this.clientSnakes.get(client).getSnakeCells().get(0) != cell) {
                         //tu bude vhodne skontrolovat ci narazil do hlavy protihraca a jeho direction aby sme vedeli
                         //kto bude zit a kto zomrie
-                        client.setGameOver(true);
+//                        client.setGameRunning(false);
+//                        clients.remove(client);
+//                        this.drawableObjects.removeAll(this.clientSnakes.get(client).getSnakeCells());
+                        clientsToRemove.add(client);
                     }
                 });
             });
         });
-
-
+      clientsToRemove.forEach(client -> {
+          this.drawableObjects.removeAll(this.clientSnakes.get(client).getSnakeCells());
+          this.clients.remove(client);
+          client.setGameRunning(false);
+          this.clientSnakes.remove(client);
+      });
 
       /*  for (int i = this.clients.size()-1; i > -1; i++) {
             int positionXHead = this.clientSnakes.get(clients.get(i)).getSnakeCells().get(0).getPositionX();
@@ -143,21 +170,67 @@ public class SnakeGame implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
+//        if (gameRunning && !this.clients.isEmpty() && !this.clientSnakes.isEmpty()) {
+//            this.clientSnakes.forEach((client,snake) -> {
+//                move();
+//                checkFoodCollision();
+//                checkCollisions();
+//                client.setDrawableGameObjects(this.drawableObjects);
+//            });
+//
+//        }
+    }
+
+    public void runGame() {
         if (gameRunning && !this.clients.isEmpty() && !this.clientSnakes.isEmpty()) {
-            this.clientSnakes.forEach((client,snake) -> {
-                move();
-                checkFoodCollision();
-                checkCollisions();
-                client.setDrawableGameObjects(this.drawableObjects);
+            this.clientSnakes.forEach((client, snake) -> {
+                this.setSnakeDirection(snake, client.getClientArrowKeyPressed());
+                snake.move();
             });
 
+            checkCollisions();
+            checkFoodCollision();
+
+            this.clients.forEach(client -> {
+                client.setGameRunning(true);
+                client.setDrawableGameObjects(this.drawableObjects);
+            });
+        }
+    }
+
+    private void setSnakeDirection(Snake snake, ClientArrowKeyPressed arrowKeyPressed) {
+        switch (arrowKeyPressed) {
+            case UP_ARROW -> {
+                if (snake.getSnakeDirection() != SnakeDirection.DOWN)
+                    snake.setSnakeDirection(SnakeDirection.UP);
+            }
+            case LEFT_ARROW -> {
+                if (snake.getSnakeDirection() != SnakeDirection.RIGHT)
+                    snake.setSnakeDirection(SnakeDirection.LEFT);
+            }
+            case DOWN_ARROW -> {
+                if (snake.getSnakeDirection() != SnakeDirection.UP)
+                    snake.setSnakeDirection(SnakeDirection.DOWN);
+            }
+            case RIGHT_ARROW -> {
+                if (snake.getSnakeDirection() != SnakeDirection.LEFT)
+                    snake.setSnakeDirection(SnakeDirection.RIGHT);
+            }
         }
     }
 
     public void addClient(ClientHandler client) {
         this.clients.add(client);
-        this.clientSnakes.put(client,new Snake(100,300, SnakeDirection.RIGHT, 10,
-                this.CELL_WIDTH, this.CELL_HEIGHT, Color.green, this.CELL_WIDTH));
+        SnakeDirection direction = SnakeDirection.RIGHT;
+        int positionX = 150;
+        int positionY = 200;
+        if (client.getClientId() == 1) {
+            positionY = 600;
+        }
+        Color colorSnake = new Color(random.nextInt(255),random.nextInt(255),
+                random.nextInt(255));
+        this.clientSnakes.put(client,new Snake(positionX, positionY, direction, 12,
+                this.CELL_WIDTH, this.CELL_HEIGHT, colorSnake, this.CELL_WIDTH));
         this.drawableObjects.addAll(this.clientSnakes.get(client).getSnakeCells());
     }
     public boolean getGameRunning() {return this.gameRunning;};
@@ -203,5 +276,9 @@ public class SnakeGame implements ActionListener {
 
     public ArrayList<DrawableGameObject> getDrawableObjects() {
         return this.drawableObjects;
+    }
+
+    public void setArrowkeyPressed(ClientArrowKeyPressed clientArrowKeyPressed) {
+        this.clientArrowKeyPressed = clientArrowKeyPressed;
     }
 }

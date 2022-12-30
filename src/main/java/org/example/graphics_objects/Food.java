@@ -65,6 +65,16 @@ public class Food implements DrawableGameObject {
         return g;
     }
 
+    @Override
+    public Color getColor() {
+        return this.foodColor;
+    }
+
+    @Override
+    public String getX() {
+        return this.positionX + "";
+    }
+
     public int getWidth() {
         return foodWidth;
     }

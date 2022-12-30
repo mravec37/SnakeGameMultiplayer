@@ -61,6 +61,11 @@ public class Cell implements DrawableGameObject {
         return g;
     }
 
+    @Override
+    public Color getColor() {
+        return this.color;
+    }
+
     public int getWidth() {
         return cellWidth;
     }
@@ -68,6 +73,9 @@ public class Cell implements DrawableGameObject {
     public int getHeight() {
         return cellHeight;
     }
-
+    @Override
+    public String getX() {
+        return this.positionX + "";
+    }
 
 }

@@ -1,8 +1,9 @@
 package org.example.graphics_objects;
 
 import java.awt.*;
+import java.io.Serializable;
 
-public abstract class GraphicShape {
+public abstract class GraphicShape implements Serializable {
     public abstract int getWidth();
     public abstract int getHeight();
     public abstract void setPositionX(int positionX);

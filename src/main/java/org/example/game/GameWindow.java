@@ -10,7 +10,7 @@ public class GameWindow extends JFrame {
     private StartGamePanel startGamePanel;
     private SnakeGame game;
     private boolean gameRunning = false;
-    GameWindow(GameGraphicsPanel gamePanel, StartGamePanel startGamePanel, SnakeGame game) {
+    public GameWindow(GameGraphicsPanel gamePanel) {
         this.game = game;
         this.startGamePanel = startGamePanel;
         this.gamePanel = gamePanel;

@@ -5,6 +5,8 @@ import org.example.graphics_objects.Rectangle;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Random;
+import java.util.Scanner;
 
 public class Snake {
     private ArrayList<Cell> snakeCells;
@@ -22,20 +24,22 @@ public class Snake {
     public Snake(int positionX, int positionY, SnakeDirection snakeDirection, int numberOfCellsAtStart, int cellWidth
             , int cellHeight, Color cellColor, int snakePositionShift) {
         this.NUMBER_OF_CELLS_AT_START = numberOfCellsAtStart;
-        this.numberOfCells = this.NUMBER_OF_CELLS_AT_START;
+        this.numberOfCells = 0;
         this.snakeDirection = snakeDirection;
         this.CELL_HEIGHT = cellHeight;
         this.CELL_WIDTH = cellWidth;
         this.snakeCells = new ArrayList<>();
         this.SNAKE_POSITION_SHIFT = snakePositionShift;
         this.cellColor = cellColor;
-        this.addCells(positionX, positionY, CELL_WIDTH, CELL_HEIGHT, this.cellColor, numberOfCellsAtStart, snakeDirection);
+        this.addCells(positionX, positionY, CELL_WIDTH, CELL_HEIGHT, this.cellColor, this.NUMBER_OF_CELLS_AT_START,
+                snakeDirection);
     }
 
     public void addCellToTail() {
         int[] shiftOfXYPosition = this.positionShift(this.CELL_WIDTH, this.CELL_HEIGHT);
         int shiftOfCellPositionX = -shiftOfXYPosition[0];
         int shiftOfCellPositionY = -shiftOfXYPosition[1];
+
         this.addCells(this.snakeCells.get(numberOfCells-1).getPositionX() + shiftOfCellPositionX,
                 this.snakeCells.get(numberOfCells-1).getPositionY() + shiftOfCellPositionY, this.CELL_WIDTH,
                 this.CELL_HEIGHT, this.cellColor, 1, this.snakeDirection);
@@ -46,7 +50,10 @@ public class Snake {
         int shiftOfCellPositionX = -shiftOfXYPosition[0];
         int shiftOfCellPositionY = -shiftOfXYPosition[1];
         for (int i = 0; i < numberOfCellsToAdd; i++)  {
-            this.snakeCells.add(new Cell(positionX, positionY, cellWidth, cellHeight, cellColor,new Rectangle()));
+            Random random = new Random();
+            Color colorSnake = new Color(random.nextInt(255),random.nextInt(255),
+                    random.nextInt(255));
+            this.snakeCells.add(new Cell(positionX, positionY, cellWidth, cellHeight, colorSnake,new Rectangle()));
             positionX += shiftOfCellPositionX;
             positionY += shiftOfCellPositionY;
             this.numberOfCells++;

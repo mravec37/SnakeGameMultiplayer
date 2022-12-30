@@ -8,11 +8,11 @@ public class Main {
     public static void main(String[] args) {
 
         SnakeGame game = new SnakeGame(SCREEN_WIDTH, SCREEN_HEIGHT);
-        GameGraphicsPanel gamePanel = new GameGraphicsPanel(game);
+        GameGraphicsPanel gamePanel = new GameGraphicsPanel();
         Timer timer = new Timer(75, game);
         timer.addActionListener(gamePanel);
         StartGamePanel startGamePanel = new StartGamePanel(SCREEN_WIDTH, SCREEN_HEIGHT, game);
-        GameWindow gameWindow = new GameWindow(gamePanel, startGamePanel, game);
+        GameWindow gameWindow = new GameWindow(gamePanel);
         //timer.addActionListener(gameWindow);
         timer.start();
         //game.startGame();
