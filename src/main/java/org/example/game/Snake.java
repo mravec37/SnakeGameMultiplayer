@@ -1,6 +1,7 @@
 package org.example.game;
 
 import org.example.graphics_objects.Cell;
+import org.example.graphics_objects.DrawableGameObject;
 import org.example.graphics_objects.Rectangle;
 
 import java.awt.*;
@@ -35,30 +36,33 @@ public class Snake {
                 snakeDirection);
     }
 
-    public void addCellToTail() {
+    public DrawableGameObject addCellToTail() {
         int[] shiftOfXYPosition = this.positionShift(this.CELL_WIDTH, this.CELL_HEIGHT);
         int shiftOfCellPositionX = -shiftOfXYPosition[0];
         int shiftOfCellPositionY = -shiftOfXYPosition[1];
 
-        this.addCells(this.snakeCells.get(numberOfCells-1).getPositionX() + shiftOfCellPositionX,
+       return this.addCells(this.snakeCells.get(numberOfCells-1).getPositionX() + shiftOfCellPositionX,
                 this.snakeCells.get(numberOfCells-1).getPositionY() + shiftOfCellPositionY, this.CELL_WIDTH,
                 this.CELL_HEIGHT, this.cellColor, 1, this.snakeDirection);
     }
-    public void addCells(int positionX, int positionY, int cellWidth, int cellHeight, Color cellColor,
+    public DrawableGameObject addCells(int positionX, int positionY, int cellWidth, int cellHeight, Color cellColor,
                         int numberOfCellsToAdd, SnakeDirection snakeDirection) {
         int[] shiftOfXYPosition = this.positionShift(this.CELL_WIDTH, this.CELL_HEIGHT);
         int shiftOfCellPositionX = -shiftOfXYPosition[0];
         int shiftOfCellPositionY = -shiftOfXYPosition[1];
+        Cell cell=null;
         for (int i = 0; i < numberOfCellsToAdd; i++)  {
             Random random = new Random();
             Color colorSnake = new Color(random.nextInt(255),random.nextInt(255),
                     random.nextInt(255));
-            this.snakeCells.add(new Cell(positionX, positionY, cellWidth, cellHeight, colorSnake,new Rectangle()));
+            cell = new Cell(positionX, positionY, cellWidth, cellHeight, colorSnake, new Rectangle());
+            this.snakeCells.add(cell);
             positionX += shiftOfCellPositionX;
             positionY += shiftOfCellPositionY;
             this.numberOfCells++;
 
         }
+        return cell;
     }
 
     public void move() {
@@ -72,13 +76,7 @@ public class Snake {
         }
         this.snakeCells.get(0).setPositionX(this.snakeCells.get(0).getPositionX() + positionXShift);
         this.snakeCells.get(0).setPositionY(this.snakeCells.get(0).getPositionY() + positionYShift);
-        /*this.snakeCells.
-        this.snakeCells.forEach(cell -> {
-        if(this.snakeCells.get(0) != cell) {
-            cell.setPositionX(cell.getPositionX() + positionXShift);
-            cell.setPositionY(cell.getPositionY() + positionYShift);
-        }
-        });*/
+
     }
 
     private int[] positionShift(int shiftX, int shiftY)  {

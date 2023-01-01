@@ -26,14 +26,6 @@ public class Food implements DrawableGameObject {
         return this.positionX;
     }
 
-    public Color getFoodColor() {
-        return foodColor;
-    }
-
-    public void setFoodColor(Color foodColor) {
-        this.foodColor = foodColor;
-    }
-
     public void setPositionX(int positionX) {
         this.positionX = positionX;
         this.foodShape.setPositionX(this.positionX);
@@ -48,7 +40,6 @@ public class Food implements DrawableGameObject {
         this.foodShape.setPositionY(this.positionY);
 
     }
-
     @Override
     public void setWidth(int width) {
         this.foodWidth = width;
@@ -64,17 +55,19 @@ public class Food implements DrawableGameObject {
         foodShape.drawShape(g, this.foodColor);
         return g;
     }
-
     @Override
     public Color getColor() {
         return this.foodColor;
     }
 
     @Override
-    public String getX() {
-        return this.positionX + "";
+    public int getX() {
+        return this.positionX;
     }
-
+    @Override
+    public int getY() {
+        return this.positionY;
+    }
     public int getWidth() {
         return foodWidth;
     }

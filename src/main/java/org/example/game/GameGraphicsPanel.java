@@ -1,13 +1,18 @@
 package org.example.game;
 
 import org.example.graphics_objects.DrawableGameObject;
+import org.example.multiplayer.ClientNameLocation;
 
+import javax.sound.sampled.*;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.geom.AffineTransform;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Objects;
 import java.util.Random;
@@ -20,27 +25,30 @@ public class GameGraphicsPanel extends JPanel  implements ActionListener {
     private  JTextField nameField;
     private boolean startScreen;
     private ArrayList<DrawableGameObject> objectsToDraw;
-    JButton continueButton;
-    JButton enterNameButton;
-    JLabel enterNameLabel;
-    int numberOfFramesDrawn = 0;
+    private JButton continueButton;
+    private JButton enterNameButton;
+    private JLabel enterNameLabel;
     private boolean gameRunning;
-
+    private boolean playSoundCue;
     private int score;
-
     private boolean playerReady;
     private ClientArrowKeyPressed arrowKeyPressed;
     private boolean gameStarted;
+    private String playerName;
+    private String highestScorePlayer;
+    private int highestScorePlayerScore;
+    private ArrayList<ClientNameLocation> clientsNamesLocations;
+    private ArrayList<JLabel> clientNameLabels;
 
     public GameGraphicsPanel() {
+        this.clientNameLabels = new ArrayList<>();
+        this.clientsNamesLocations = new ArrayList<>();
         this.objectsToDraw = new ArrayList<>();
 //        this.SCREEN_WIDTH = this.game.getScreenWidth();
 //        this.SCREEN_HEIGHT = this.game.getScreenHeight();
-        this.playerReady = false;
-        this.gameStarted = false;
+        this.playerName = "";
+        this.highestScorePlayer = "";
         random = new Random();
-        this.score = 0;
-        this.gameRunning = false;
         this.setPreferredSize(new Dimension(SCREEN_WIDTH, SCREEN_HEIGHT));
         this.setBackground(Color.BLACK);
         this.startScreen = true;
@@ -53,7 +61,6 @@ public class GameGraphicsPanel extends JPanel  implements ActionListener {
 
     private void setUpListeners() {
         this.continueButton.addActionListener(e -> {
-            //startScreen = true;
             System.out.println("Button pressed");
             this.startScreen = true;
             continueButton.setVisible(false);
@@ -61,13 +68,19 @@ public class GameGraphicsPanel extends JPanel  implements ActionListener {
         });
 
         this.enterNameButton.addActionListener(e -> {
+        if (!this.nameField.getText().equals("")) {
+            this.playerName = this.nameField.getText();
             this.startScreen = false;
             this.playerReady = true;
             System.out.println("Button pressed xdd");
             hideStartScreen();
+        }
         });
     }
 
+    public String getPlayerName() {
+        return this.playerName;
+    }
     public void setGameRunning(boolean gameRunning) {
         this.gameRunning = gameRunning;
 
@@ -120,48 +133,149 @@ public class GameGraphicsPanel extends JPanel  implements ActionListener {
                this.gameOverGraphics(g);
     }
 
-    public GameGraphicsPanel getGamePanel() {
-        return this;
-    }
-
-
     public void draw(Graphics g, ArrayList<DrawableGameObject> objectsToDraw) {
+        Graphics2D g2d = (Graphics2D) g;
+        AffineTransform defaultAt = g2d.getTransform();
+        AffineTransform at = new AffineTransform();
+        at.rotate(Math.toRadians(0));
+        this.playSoundCue();
         g.setFont(new Font("Ink Free", Font.BOLD,40));
         FontMetrics metrics2 = getFontMetrics(g.getFont());
         g.setColor(Color.red);
-        g.drawString("Score: " + this.score, (SCREEN_WIDTH - metrics2.stringWidth("Score: " + this.score))/2,
-                g.getFont().getSize());
-        numberOfFramesDrawn++;
+        g.drawString("Your Score: " + this.score, SCREEN_WIDTH - (metrics2.stringWidth("Score: " +
+                        this.score)+100), g.getFont().getSize());
+        g.drawString("Score Leader: " + this.highestScorePlayerScore + " " + this.highestScorePlayer,
+                10, g.getFont().getSize());
+        this.drawPlayerNames(g);
+
         if (this.gameRunning) {
             objectsToDraw.forEach(objectToDraw -> {
                g.setColor(objectToDraw.getColor());
                objectToDraw.drawObject(g);
             });
-        } else if (!this.gameRunning && !this.startScreen){}
-            //this.gameOverGraphics(g);
-          else if (!this.gameRunning && this.startScreen)
+        } else if (!this.gameRunning && this.startScreen)
               this.startScreen(g);
+        this.drawPlayerNames(g);
+    }
+
+    private void drawPlayerNames(Graphics g) {
+
+        this.clientsNamesLocations.forEach(clients -> {
+            int posX = clients.getClientSnakeHeadX();
+            int posY = clients.getClientSnakeHeadY();
+            String name = clients.getClientName();
+            SnakeDirection direction = clients.getSnakeDirection();
+            System.out.println("Pos X: " + posX + " posy: " + posY + " name " +  name);
+            Graphics2D g2 = (Graphics2D) g;
+            g.setFont(new Font("Ink Free", Font.BOLD,20));
+            AffineTransform affineTransform = g2.getTransform();
+            g.setColor(Color.white);
+            FontMetrics metrics = getFontMetrics(g.getFont());
+            double theta = 0;
+            String nameWithScore = "";
+            int x = 0;
+            int y=0;
+            nameWithScore =  this.score + " " + name;
+            if (direction == SnakeDirection.RIGHT) {
+                x =  (posX - metrics.stringWidth(name + " " + this.score)) + 15;
+                y = posY - 15;
+            }
+           else if (direction == SnakeDirection.UP) {
+                theta = - Math.PI/2;
+                y = posY - 15;
+                x = posX - metrics.stringWidth(name + " " + this.score);
+            }
+           else if (direction == SnakeDirection.LEFT) {
+                theta = Math.PI;
+                y = posY - 30;
+                x = posX - metrics.stringWidth(name + " " + this.score);
+            }
+            else if (direction == SnakeDirection.DOWN) {
+                theta =  Math.PI / 2;
+                y = posY - 30;
+                x = posX - metrics.stringWidth(name + " " + this.score) + 15;
+            }
+            g2.rotate(theta, posX, posY);
+            g2.drawString(nameWithScore, x, y);
+            g2.setTransform(affineTransform);
+        });
+    }
+
+
+    private void playSoundCue() {
+
+        if (this.playSoundCue) {
+            File file;
+            Clip clip;
+            AudioInputStream audioStream;
+            file = new File("food_eaten.wav");
+            try {
+                audioStream = AudioSystem.getAudioInputStream(file);
+                clip = AudioSystem.getClip();
+                clip.open(audioStream);
+            } catch (UnsupportedAudioFileException e) {
+                throw new RuntimeException(e);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            } catch (LineUnavailableException e) {
+                throw new RuntimeException(e);
+            }
+            System.out.println("Play clip");
+            clip.start();
+            this.playSoundCue = false;
+        }
     }
 
     public void gameOverGraphics(Graphics g) {
-
+        Graphics2D g2d = (Graphics2D) g;
+        AffineTransform defaultAt = g2d.getTransform();
+        AffineTransform at = new AffineTransform();
+        at.rotate(Math.toRadians(0));
+        File file;
+        Clip clip;
+        AudioInputStream audioStream;
+        file = new File("KEKW.wav");
+        try {
+            audioStream = AudioSystem.getAudioInputStream(file);
+            clip = AudioSystem.getClip();
+            clip.open(audioStream);
+        } catch (UnsupportedAudioFileException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (LineUnavailableException e) {
+            throw new RuntimeException(e);
+        }
+        System.out.println("Play clip");
+        clip.start();
+        this.arrowKeyPressed = ClientArrowKeyPressed.NONE;
         System.out.println("game over");
         g.setColor(Color.red);
         g.setFont(new Font("Ink Free", Font.BOLD,75));
         FontMetrics metrics = getFontMetrics(g.getFont());
         g.drawString("Game Over", (SCREEN_WIDTH - metrics.stringWidth("Game Over"))/2,
                 SCREEN_HEIGHT/2);
+        g.setFont(new Font("Ink Free", Font.BOLD,43));
         g.setColor(Color.red);
         g.setFont(new Font("Ink Free", Font.BOLD,40));
         FontMetrics metrics2 = getFontMetrics(g.getFont());
-//       g.drawString("Score: " + this.game.getApplesEaten(), (SCREEN_WIDTH - metrics2.stringWidth("Score: " +
-//                        this.game.getApplesEaten()))/2,
-//                g.getFont().getSize());
 
         continueButton.setVisible(true);
         this.continueButton.setBounds((SCREEN_WIDTH - metrics.stringWidth("Game Over"))/2,
                 SCREEN_HEIGHT/2 + 50, metrics.stringWidth("Game Over"),33);
 
+    }
+
+    public void setHighestScorePlayer(String highestScorePlayer) {
+        this.highestScorePlayer = highestScorePlayer;
+    }
+
+    public void setHighestScorePlayerScore(int highestScorePlayerScore) {
+        this.highestScorePlayerScore = highestScorePlayerScore;
+    }
+
+    public void setPlaySoundQue(boolean playSoundQue) {
+        this.playSoundCue = playSoundQue;
     }
 
     private void startScreen(Graphics g) {
@@ -176,9 +290,10 @@ public class GameGraphicsPanel extends JPanel  implements ActionListener {
         System.out.println("startScreen2");
     }
 
-    public void setArrowkeyPressed(ClientArrowKeyPressed clientArrowKeyPressed) {
-        this.arrowKeyPressed = clientArrowKeyPressed;
+    public void setClientsNamesLocations(ArrayList<ClientNameLocation> clientsNamesLocations) {
+        this.clientsNamesLocations = clientsNamesLocations;
     }
+
 
     public void setScore(int score) {
         this.score = score;

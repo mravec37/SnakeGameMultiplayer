@@ -74,8 +74,12 @@ public class Cell implements DrawableGameObject {
         return cellHeight;
     }
     @Override
-    public String getX() {
-        return this.positionX + "";
+    public int getX() {
+        return this.positionX;
+    }
+    @Override
+    public int getY() {
+        return this.positionY;
     }
 
 }

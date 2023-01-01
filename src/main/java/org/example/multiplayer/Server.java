@@ -13,9 +13,10 @@ public class Server implements ActionListener {
     private final int MAX_CLIENTS;
     public static int connectedClients;
     private SnakeGame snakeGame;
-
+    private boolean gameStarted;
     public Server(ServerSocket serverSocket, int maxClients, SnakeGame snakeGame) {
         this.serverSocket = serverSocket;
+        this.gameStarted = false;
         this.MAX_CLIENTS = maxClients;
         this.connectedClients = 0;
         this.snakeGame = snakeGame;
@@ -29,8 +30,10 @@ public class Server implements ActionListener {
                 Socket socket = serverSocket.accept();                //vytvori novy socket urceny na komunikaciu so socketom klienta
                 System.out.println("A new client has connected!");
                 this.connectedClients++;
-                if (connectedClients == 1)
+                if (connectedClients == 1 && !this.gameStarted) {
                     this.snakeGame.startGame();
+                    this.gameStarted = true;
+                }
                 ClientHandler clientHandler = new ClientHandler(socket, this.connectedClients - 1);
                 TickTimer.addActionListener(clientHandler);
                 this.snakeGame.addClient(clientHandler);

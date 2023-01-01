@@ -10,12 +10,31 @@ public class MessageForClient implements Serializable {
     private boolean gameRunning;
     private int clientScore;
 
-    public MessageForClient(ArrayList<DrawableGameObject> objectsToDraw, boolean gameOver, int clientScore) {
+    private String scoreLeader;
+    private int scoreLeaderScore;
+    private boolean playSoundQue;
+    private ArrayList<ClientNameLocation> clientNameLocations;
+
+    public MessageForClient(ArrayList<DrawableGameObject> objectsToDraw, boolean gameOver, int clientScore,
+                            String scoreLeader, int scoreLeaderScore, boolean playSoundQue,
+                            ArrayList<ClientNameLocation> clientsNamesLocations) {
        // this.objectsToDraw = (ArrayList<DrawableGameObject>) objectsToDraw.clone();
+        this.scoreLeader = scoreLeader;
+        this.clientNameLocations = clientsNamesLocations;
+        this.playSoundQue = playSoundQue;
+        this.scoreLeaderScore = scoreLeaderScore;
         this.objectsToDraw = objectsToDraw;
         this.clientScore = clientScore;
         //System.out.println("Objects to draw in message is: " + objectsToDraw.get(1).getX());
         this.gameRunning = gameOver;
+    }
+
+    public ArrayList<ClientNameLocation> getClientNameLocations() {
+        return clientNameLocations;
+    }
+
+    public boolean getPlaySoundQue() {
+        return this.playSoundQue;
     }
 
     public int getClientScore() {
@@ -29,4 +48,12 @@ public class MessageForClient implements Serializable {
     public boolean isGameRunning() {
         return this.gameRunning;
     }
+    public String getScoreLeader() {
+        return scoreLeader;
+    }
+
+    public int getScoreLeaderScore() {
+        return scoreLeaderScore;
+    }
+
 }

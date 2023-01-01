@@ -7,12 +7,12 @@ import java.awt.event.ActionListener;
 public class GameWindow extends JFrame {
 
     private GameGraphicsPanel gamePanel;
-    private StartGamePanel startGamePanel;
+  //  private StartGamePanel startGamePanel;
     private SnakeGame game;
     private boolean gameRunning = false;
     public GameWindow(GameGraphicsPanel gamePanel) {
         this.game = game;
-        this.startGamePanel = startGamePanel;
+        //this.startGamePanel = startGamePanel;
         this.gamePanel = gamePanel;
         this.add(gamePanel);
         this.setTitle("Snake");

@@ -15,5 +15,6 @@ public interface DrawableGameObject<T> extends Serializable {
 
     Color getColor();
 
-    String getX();
+    int getX();
+    int getY();
 }

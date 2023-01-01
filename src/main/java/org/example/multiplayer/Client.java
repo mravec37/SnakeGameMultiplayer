@@ -7,7 +7,9 @@ import org.example.game.GameWindow;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.*;
+import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.net.InetAddress;
 
 public class Client implements ActionListener {
 
@@ -51,6 +53,16 @@ public class Client implements ActionListener {
             this.sendMessageToServer();
         }
     }
+
+    private void updateGameGraphicsPanel(MessageForClient messageForClient) {
+        this.gameGraphicsPanel.setObjectsToDraw(messageForClient.getObjectsToDraw());
+        this.gameGraphicsPanel.setScore(messageForClient.getClientScore());
+        this.gameGraphicsPanel.setGameRunning(messageForClient.isGameRunning());
+        this.gameGraphicsPanel.setHighestScorePlayer(messageForClient.getScoreLeader());
+        this.gameGraphicsPanel.setHighestScorePlayerScore(messageForClient.getScoreLeaderScore());
+        this.gameGraphicsPanel.setPlaySoundQue(messageForClient.getPlaySoundQue());
+        this.gameGraphicsPanel.setClientsNamesLocations(messageForClient.getClientNameLocations());
+    }
     private void readMessageFromServer() {
 
         System.out.println("Reading message");
@@ -61,9 +73,7 @@ public class Client implements ActionListener {
             System.out.println("Drawable objects are " + messageForClient.getObjectsToDraw().toString());
             System.out.println("Message read");
             //if (messageForClient.getObjectsToDraw() != null)
-            this.gameGraphicsPanel.setObjectsToDraw(messageForClient.getObjectsToDraw());
-            this.gameGraphicsPanel.setScore(messageForClient.getClientScore());
-            this.gameGraphicsPanel.setGameRunning(messageForClient.isGameRunning());
+            this.updateGameGraphicsPanel(messageForClient);
             if (!messageForClient.isGameRunning()) {
                 this.playerPlaying = false;
                 this.gameGraphicsPanel.setGameRunning(false);
@@ -91,7 +101,8 @@ public class Client implements ActionListener {
 
     private void sendMessageToServer() {
         if (this.playerPlaying) {
-            MessageForServer messageForServer = new MessageForServer(this.arrowKeyPressed);
+            MessageForServer messageForServer = new MessageForServer(this.arrowKeyPressed,
+                    this.gameGraphicsPanel.getPlayerName());
             try {
                 this.objectOutputStream.writeObject(messageForServer);
                 objectOutputStream.reset();
@@ -110,7 +121,12 @@ public class Client implements ActionListener {
         try {
             System.out.println("Connecting to server");
             this.playerPlaying = true;
-            this.socket = new Socket("192.168.1.36",7770);
+            //this.socket = new Socket("192.168.1.36",7770);
+            byte[] address = new byte[]{10, 64, 17, 89};
+            InetAddress serverAddress = InetAddress.getByAddress(address);
+            InetAddress localAddress= InetAddress.getByName("localhost");
+            this.socket = new Socket(serverAddress, 3201, localAddress, 7777);
+            //this.socket = new Socket("10.64.17.89, 3201", 3201, "192.168.1.36", 7777);
             this.outputStream = socket.getOutputStream();
             this.objectOutputStream = new ObjectOutputStream(this.outputStream);
             this.inputStream = this.socket.getInputStream();

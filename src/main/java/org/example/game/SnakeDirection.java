@@ -1,6 +1,8 @@
 package org.example.game;
 
-public enum SnakeDirection {
+import java.io.Serializable;
+
+public enum SnakeDirection implements Serializable {
     UP,
     DOWN,
     RIGHT,
