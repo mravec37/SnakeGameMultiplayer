@@ -18,7 +18,6 @@ public class Server implements ActionListener {
         this.serverSocket = serverSocket;
         this.gameStarted = false;
         this.MAX_CLIENTS = maxClients;
-        this.connectedClients = 0;
         this.snakeGame = snakeGame;
         TickTimer.addActionListener(this);
     }
@@ -26,28 +25,27 @@ public class Server implements ActionListener {
     public void startServer() {
 
         try {
-            while (!serverSocket.isClosed() && this.connectedClients <= this.MAX_CLIENTS) {
-                Socket socket = serverSocket.accept();                //vytvori novy socket urceny na komunikaciu so socketom klienta
+            while (!serverSocket.isClosed() && connectedClients <= this.MAX_CLIENTS) {
+                Socket socket = serverSocket.accept();
                 System.out.println("A new client has connected!");
-                this.connectedClients++;
+                connectedClients++;
                 if (connectedClients == 1 && !this.gameStarted) {
                     this.snakeGame.startGame();
                     this.gameStarted = true;
                 }
-                ClientHandler clientHandler = new ClientHandler(socket, this.connectedClients - 1);
+                ClientHandler clientHandler = new ClientHandler(socket, connectedClients - 1);
                 TickTimer.addActionListener(clientHandler);
                 this.snakeGame.addClient(clientHandler);
-                //Thread thread = new Thread(clientHandler);
-                //thread.start();
             }
 
         } catch (IOException e) {
+            this.closeServerSocket();
             throw new RuntimeException(e);
         }
 
     }
 
-    public void closeServerSocket() {
+    private void closeServerSocket() {
         try {
             if(serverSocket != null) {
                 serverSocket.close();

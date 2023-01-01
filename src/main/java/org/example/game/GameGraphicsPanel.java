@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.Objects;
 import java.util.Random;
 
-public class GameGraphicsPanel extends JPanel  implements ActionListener {
+public class GameGraphicsPanel extends JPanel {
 
     private final int SCREEN_WIDTH = 1670;
     private final int SCREEN_HEIGHT = 900;
@@ -39,6 +39,7 @@ public class GameGraphicsPanel extends JPanel  implements ActionListener {
     private int highestScorePlayerScore;
     private ArrayList<ClientNameLocation> clientsNamesLocations;
     private ArrayList<JLabel> clientNameLabels;
+    private boolean gameOverSoundPlayed;
 
     public GameGraphicsPanel() {
         this.clientNameLabels = new ArrayList<>();
@@ -73,6 +74,7 @@ public class GameGraphicsPanel extends JPanel  implements ActionListener {
             this.startScreen = false;
             this.playerReady = true;
             System.out.println("Button pressed xdd");
+            this.gameOverSoundPlayed = false;
             hideStartScreen();
         }
         });
@@ -175,7 +177,7 @@ public class GameGraphicsPanel extends JPanel  implements ActionListener {
             String nameWithScore = "";
             int x = 0;
             int y=0;
-            nameWithScore =  this.score + " " + name;
+            nameWithScore =  clients.getClientScore() + " " + name;
             if (direction == SnakeDirection.RIGHT) {
                 x =  (posX - metrics.stringWidth(name + " " + this.score)) + 15;
                 y = posY - 15;
@@ -227,6 +229,7 @@ public class GameGraphicsPanel extends JPanel  implements ActionListener {
     }
 
     public void gameOverGraphics(Graphics g) {
+    if (!this.gameOverSoundPlayed) {
         Graphics2D g2d = (Graphics2D) g;
         AffineTransform defaultAt = g2d.getTransform();
         AffineTransform at = new AffineTransform();
@@ -248,6 +251,8 @@ public class GameGraphicsPanel extends JPanel  implements ActionListener {
         }
         System.out.println("Play clip");
         clip.start();
+        this.gameOverSoundPlayed = true;
+    }
         this.arrowKeyPressed = ClientArrowKeyPressed.NONE;
         System.out.println("game over");
         g.setColor(Color.red);
@@ -303,10 +308,6 @@ public class GameGraphicsPanel extends JPanel  implements ActionListener {
         this.repaint();
     }
 
-    @Override
-    public void actionPerformed(ActionEvent e) {
-       // this.repaint();
-    }
 
     public boolean isPlayerReady() {
         return playerReady;

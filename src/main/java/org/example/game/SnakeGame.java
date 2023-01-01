@@ -27,7 +27,8 @@ public class SnakeGame {
     private final int CELL_HEIGHT = 20;
     private final int NUMBER_OF_CELLS_AT_START;
     private final int NUMBER_OF_FOOD_ON_BOARD = 7;
-    private ClientArrowKeyPressed clientArrowKeyPressed;
+    private String highestScoreClientName;
+    private int highestScore;
     private ArrayList<Food> snakeFood;
     public SnakeGame(int screenWidth, int screenHeight) {
         this.SCREEN_HEIGHT = screenHeight;
@@ -136,8 +137,9 @@ public class SnakeGame {
 
             this.clients.forEach(client2 -> {
                 this.clientSnakes.get(client2).getSnakeCells().forEach(cell -> {
-                    if (positionXHead == cell.getPositionX() && positionYHead == cell.getPositionY() &&
-                            this.clientSnakes.get(client).getSnakeCells().get(0) != cell) {
+                    if ((positionXHead >= cell.getPositionX()  && positionXHead <=  cell.getPositionX() + 15  &&
+                            positionYHead >= cell.getPositionY() && positionYHead <= cell.getPositionY() + 15 &&
+                            this.clientSnakes.get(client).getSnakeCells().get(0) != cell)) {
                         //tu bude vhodne skontrolovat ci narazil do hlavy protihraca a jeho direction aby sme vedeli
                         //kto bude zit a kto zomrie
                         clientsToRemove.add(client);
@@ -163,15 +165,31 @@ public class SnakeGame {
                 this.setSnakeDirection(snake, client.getClientArrowKeyPressed());
                 snake.move();
             });
-            checkCollisions();
-            checkFoodCollision();
+            this.checkCollisions();
+            this.checkFoodCollision();
+            this.setHighestScoreClient();
             this.clients.forEach(client -> {
                 client.setGameRunning(true);
                 client.setSnakeHeadX(clientSnakes.get(client).getSnakeCells().get(0).getPositionX());
                 client.setSnakeHeadY(clientSnakes.get(client).getSnakeCells().get(0).getPositionY());
                 client.setSnakeDirection(clientSnakes.get(client).getSnakeDirection());
+                client.setHighestScoreClient(this.highestScoreClientName, this.highestScore);
+                client.setClientsNamesLocations();
             });
         }
+    }
+
+    private void setHighestScoreClient() {
+        int highestScore = Integer.MIN_VALUE;
+        String name = "";
+        for (ClientHandler client : clients)  {
+            if (client.getClientScore() > highestScore) {
+                highestScore = client.getClientScore();
+                name = client.getClientName();
+            }
+        }
+        this.highestScore = highestScore;
+        this.highestScoreClientName = name;
     }
 
     private void setSnakeDirection(Snake snake, ClientArrowKeyPressed arrowKeyPressed) {
