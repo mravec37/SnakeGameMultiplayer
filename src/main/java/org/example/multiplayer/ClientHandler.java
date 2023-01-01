@@ -114,7 +114,6 @@ public class ClientHandler implements Runnable, ActionListener {
             Server.connectedClients--;
             TickTimer.removeActionListener(this);
             try {
-                socket.close();
                 objectInputStream.close();
                 objectOutputStream.close();
             } catch (IOException ex) {

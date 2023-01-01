@@ -92,7 +92,7 @@ public class Client implements ActionListener {
     }
 
     private void disconnectClient() throws IOException {
-        this.socket.close();
+        //this.socket.close();
         this.outputStream.close();
         this.objectOutputStream.close();
         this.inputStream.close();
@@ -121,10 +121,10 @@ public class Client implements ActionListener {
         try {
             System.out.println("Connecting to server");
             this.playerPlaying = true;
-            //this.socket = new Socket("192.168.1.36",7770);
+           // this.socket = new Socket("192.168.1.36",7770);
             byte[] address = new byte[]{10, 64, 17, 89};
             InetAddress serverAddress = InetAddress.getByAddress(address);
-            InetAddress localAddress= InetAddress.getByName("localhost");
+            InetAddress localAddress= InetAddress.getByName("192.168.1.36");
             this.socket = new Socket(serverAddress, 3201, localAddress, 7777);
             //this.socket = new Socket("10.64.17.89, 3201", 3201, "192.168.1.36", 7777);
             this.outputStream = socket.getOutputStream();
