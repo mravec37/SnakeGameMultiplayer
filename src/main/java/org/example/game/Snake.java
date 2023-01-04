@@ -18,7 +18,6 @@ public class Snake {
     private final int CELL_HEIGHT;
 
     private int numberOfCells;
-    private final int SNAKE_POSITION_SHIFT;
 
     private Color cellColor;
 
@@ -30,7 +29,6 @@ public class Snake {
         this.CELL_HEIGHT = cellHeight;
         this.CELL_WIDTH = cellWidth;
         this.snakeCells = new ArrayList<>();
-        this.SNAKE_POSITION_SHIFT = snakePositionShift;
         this.cellColor = cellColor;
         this.addCells(positionX, positionY, CELL_WIDTH, CELL_HEIGHT, this.cellColor, this.NUMBER_OF_CELLS_AT_START,
                 snakeDirection);
@@ -102,13 +100,6 @@ public class Snake {
         return shiftOfXYPositions;
     }
 
-    public int getNumberOfCells() {
-        return numberOfCells;
-    }
-
-    public void setNumberOfCells(int numberOfCells) {
-        this.numberOfCells = numberOfCells;
-    }
     public ArrayList<Cell> getSnakeCells() {
         return snakeCells;
     }
@@ -121,16 +112,6 @@ public class Snake {
         return snakeDirection;
     }
 
-    public int getNUMBER_OF_CELLS_AT_START() {
-        return NUMBER_OF_CELLS_AT_START;
-    }
 
-    public int getCELL_WIDTH() {
-        return CELL_WIDTH;
-    }
-
-    public int getCELL_HEIGHT() {
-        return CELL_HEIGHT;
-    }
 
 }

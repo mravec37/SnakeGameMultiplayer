@@ -1,5 +1,7 @@
 package org.example.game;
 
+import org.example.exceptions.PlayerNameIsEmptyException;
+import org.example.exceptions.PlayerNameIsTooLongException;
 import org.example.graphics_objects.DrawableGameObject;
 import org.example.multiplayer.ClientNameLocation;
 
@@ -45,8 +47,6 @@ public class GameGraphicsPanel extends JPanel {
         this.clientNameLabels = new ArrayList<>();
         this.clientsNamesLocations = new ArrayList<>();
         this.objectsToDraw = new ArrayList<>();
-//        this.SCREEN_WIDTH = this.game.getScreenWidth();
-//        this.SCREEN_HEIGHT = this.game.getScreenHeight();
         this.playerName = "";
         this.highestScorePlayer = "";
         random = new Random();
@@ -62,22 +62,34 @@ public class GameGraphicsPanel extends JPanel {
 
     private void setUpListeners() {
         this.continueButton.addActionListener(e -> {
-            System.out.println("Button pressed");
             this.startScreen = true;
             continueButton.setVisible(false);
             this.gameStarted = false;
         });
 
         this.enterNameButton.addActionListener(e -> {
-        if (!this.nameField.getText().equals("")) {
+        boolean validated = true;
+        try {
+            this.validatePlayerName(this.nameField.getText());
+        } catch(IllegalArgumentException illegalArgumentException) {
+            validated = false;
+            System.out.println(illegalArgumentException.getMessage());
+        }
+        if (validated) {
             this.playerName = this.nameField.getText();
             this.startScreen = false;
             this.playerReady = true;
-            System.out.println("Button pressed xdd");
             this.gameOverSoundPlayed = false;
             hideStartScreen();
         }
         });
+    }
+
+    private void validatePlayerName(String playerName) throws PlayerNameIsEmptyException, PlayerNameIsTooLongException {
+        if (playerName.length() > 15)
+            throw new PlayerNameIsTooLongException("Your name is longer than 15 characters, choose shorter name");
+        if (playerName.equals(""))
+            throw new PlayerNameIsEmptyException("Your name is empty");
     }
 
     public String getPlayerName() {
@@ -222,37 +234,36 @@ public class GameGraphicsPanel extends JPanel {
             } catch (LineUnavailableException e) {
                 throw new RuntimeException(e);
             }
-            System.out.println("Play clip");
             clip.start();
             this.playSoundCue = false;
         }
     }
 
     public void gameOverGraphics(Graphics g) {
-    if (!this.gameOverSoundPlayed) {
-        Graphics2D g2d = (Graphics2D) g;
-        AffineTransform defaultAt = g2d.getTransform();
-        AffineTransform at = new AffineTransform();
-        at.rotate(Math.toRadians(0));
-        File file;
-        Clip clip;
-        AudioInputStream audioStream;
-        file = new File("KEKW.wav");
-        try {
-            audioStream = AudioSystem.getAudioInputStream(file);
-            clip = AudioSystem.getClip();
-            clip.open(audioStream);
-        } catch (UnsupportedAudioFileException e) {
-            throw new RuntimeException(e);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        } catch (LineUnavailableException e) {
-            throw new RuntimeException(e);
-        }
-        System.out.println("Play clip");
-        clip.start();
-        this.gameOverSoundPlayed = true;
-    }
+//    if (!this.gameOverSoundPlayed) {
+//        Graphics2D g2d = (Graphics2D) g;
+//        AffineTransform defaultAt = g2d.getTransform();
+//        AffineTransform at = new AffineTransform();
+//        at.rotate(Math.toRadians(0));
+//        File file;
+//        Clip clip;
+//        AudioInputStream audioStream;
+//        file = new File("KEKW.wav");
+//        try {
+//            audioStream = AudioSystem.getAudioInputStream(file);
+//            clip = AudioSystem.getClip();
+//            clip.open(audioStream);
+//        } catch (UnsupportedAudioFileException e) {
+//            throw new RuntimeException(e);
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        } catch (LineUnavailableException e) {
+//            throw new RuntimeException(e);
+//        }
+//        System.out.println("Play clip");
+//        clip.start();
+//        this.gameOverSoundPlayed = true;
+//    }
         this.arrowKeyPressed = ClientArrowKeyPressed.NONE;
         System.out.println("game over");
         g.setColor(Color.red);

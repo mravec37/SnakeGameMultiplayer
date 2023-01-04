@@ -9,8 +9,7 @@ import java.awt.event.ActionListener;
 import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicReference;
+
 
 public class ClientHandler implements ActionListener {
 
@@ -24,10 +23,8 @@ public class ClientHandler implements ActionListener {
         private ArrayList<DrawableGameObject> drawableGameObjects;
 
         private ClientArrowKeyPressed clientArrowKeyPressed;
-        private String clientUsername;
         private static ArrayList<ClientHandler> clients = new ArrayList<>();
         private final int clientId;
-        private static int lastId = 0;
         private boolean gameOver;
         private int clientScore;
         private int snakeHeadX;
@@ -107,13 +104,15 @@ public class ClientHandler implements ActionListener {
     }
 
     private void getMessageFromClient() {
-        try {
-            MessageForServer messageForServer = (MessageForServer) objectInputStream.readObject();
-            this.clientArrowKeyPressed = messageForServer.getArrowKeyPressed();
-            this.clientName = messageForServer.getPlayerName();
-        } catch (IOException | ClassNotFoundException e) {
-            this.closeCommunication();
-            throw new RuntimeException(e);
+        if (this.socket.isConnected()) {
+            try {
+                MessageForServer messageForServer = (MessageForServer) objectInputStream.readObject();
+                this.clientArrowKeyPressed = messageForServer.getArrowKeyPressed();
+                this.clientName = messageForServer.getPlayerName();
+            } catch (IOException | ClassNotFoundException e) {
+                this.closeCommunication();
+                throw new RuntimeException(e);
+            }
         }
     }
 
@@ -121,32 +120,18 @@ public class ClientHandler implements ActionListener {
         this.highestScoreClient = name;
         this.highestScore = highestScore;
     }
-//    private AtomicReference<ClientHandler> getHighestScoreClient() {
-//        AtomicReference<ClientHandler> highestScoreClient = new AtomicReference<>();
-//        AtomicInteger highestScore = new AtomicInteger(Integer.MIN_VALUE);
-//        clients.forEach(client -> {
-//            if (client.getClientScore() > highestScore.get()) {
-//                highestScore.set(client.getClientScore());
-//                highestScoreClient.set(client);
-//            }
-//        });
-//        return highestScoreClient;
-//    }
     private void sendMessageToClient() {
-        try {
-            System.out.println("sending message to client");
-            MessageForClient messageForClient = new MessageForClient(this.drawableGameObjects, this.gameRunning,
-                    this.clientScore, this.highestScoreClient, this.highestScore,
-                    this.playSoundCue, this.clientsNamesLocations);
-            System.out.println("Message is: " + messageForClient.isGameRunning() + " Dr Obj: " +
-                    messageForClient.getObjectsToDraw());
-            objectOutputStream.writeObject(messageForClient);
-            objectOutputStream.reset();
-            System.out.println("message sent");
-            this.playSoundCue = false;
-        } catch (IOException e) {
-            //this.closeCommunication();
-            throw new RuntimeException(e);
+        if (this.socket.isConnected()) {
+            try {
+                MessageForClient messageForClient = new MessageForClient(this.drawableGameObjects, this.gameRunning,
+                        this.clientScore, this.highestScoreClient, this.highestScore,
+                        this.playSoundCue, this.clientsNamesLocations);
+                objectOutputStream.writeObject(messageForClient);
+                objectOutputStream.reset();
+                this.playSoundCue = false;
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 

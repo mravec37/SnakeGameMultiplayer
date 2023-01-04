@@ -73,6 +73,5 @@ public class Server implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         this.snakeGame.runGame();
-        //System.out.println("Server Action performed at: "+ java.time.LocalTime.now());
     }
 }

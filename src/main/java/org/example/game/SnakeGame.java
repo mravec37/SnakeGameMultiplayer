@@ -14,8 +14,6 @@ public class SnakeGame {
     private final int SCREEN_WIDTH;
     private final int SCREEN_HEIGHT;
     private final int UNIT_SIZE = 20;
-    private int numberOfCells = 5;
-    private int foodEaten = 0;
     private boolean gameRunning;
     private Random random;
     private Snake snake;
@@ -100,7 +98,6 @@ public class SnakeGame {
             if (positionX >= food.getPositionX() -15 && positionX <=  food.getPositionX() + 15  && positionY >=
                     food.getPositionY() - 15 && positionY <= food.getPositionY() + 15) {
                 client.setClientScore(client.getClientScore() + 1);
-                System.out.println("Collision with food");
                 this.drawableObjects.add(clientSnakes.get(client).addCellToTail());
                 foodToRemove.add(food);
             }
@@ -119,19 +116,15 @@ public class SnakeGame {
 
           if (positionYHead >= SCREEN_HEIGHT) {
               clientsToRemove.add(client);
-              System.out.println("Game over: Screen Height");
           }
 
           if (positionYHead <= -20) {
               clientsToRemove.add(client);
-              System.out.println("Game over: Screen Height");
           }
           if (positionXHead >= SCREEN_WIDTH) {
               clientsToRemove.add(client);
-              System.out.println("Game over: Screen Height");
           }
           if (positionXHead <= - 20) {
-              System.out.println("Game over: Screen Height");
               clientsToRemove.add(client);
           }
 
@@ -140,12 +133,7 @@ public class SnakeGame {
                     if ((positionXHead >= cell.getPositionX()  && positionXHead <=  cell.getPositionX() + 15  &&
                             positionYHead >= cell.getPositionY() && positionYHead <= cell.getPositionY() + 15 &&
                             this.clientSnakes.get(client).getSnakeCells().get(0) != cell)) {
-                        //tu bude vhodne skontrolovat ci narazil do hlavy protihraca a jeho direction aby sme vedeli
-                        //kto bude zit a kto zomrie
                         clientsToRemove.add(client);
-                        System.out.println("game over: snake collision: headX: " + positionXHead + " headY:" +
-                                "cell X: " + cell.getPositionX() + " cell Y: " + cell.getPositionY() + " head: " +
-                                head + " cell: " + cell.toString());
                     }
                 });
             });

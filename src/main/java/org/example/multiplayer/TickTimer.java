@@ -7,7 +7,7 @@ import java.awt.event.ActionListener;
 public class TickTimer {
     private static Timer timer;
     private static int DELAY = 64;
-
+    private  TickTimer(){}
     public static void addActionListener(ActionListener actionListener) {
         if (TickTimer.timer == null) {
             timer = new Timer(DELAY, actionListener);

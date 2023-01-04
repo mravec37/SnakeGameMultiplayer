@@ -25,7 +25,6 @@ public class MessageForClient implements Serializable {
         this.scoreLeaderScore = scoreLeaderScore;
         this.objectsToDraw = objectsToDraw;
         this.clientScore = clientScore;
-        //System.out.println("Objects to draw in message is: " + objectsToDraw.get(1).getX());
         this.gameRunning = gameOver;
     }
 
